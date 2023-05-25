@@ -25,9 +25,9 @@ Route::get('/', function ()
     ]);
 });
 
-Route::get('posts/{post}', function($slug)//when visiting posts/something, pass the something to the funciton
+Route::get('posts/{post}', function($id)//when visiting posts/something, pass the something to the funciton
 {   
-    $post = Post::findOrFail($slug);
+    $post = Post::findOrFail($id);
     //load the post view (post.blade.php) and pass the matching post to the view
     return view('post', [
         'post' => $post

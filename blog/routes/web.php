@@ -2,6 +2,7 @@
 
 use App\Models\Post;
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 
@@ -20,13 +21,13 @@ Route::get('/', function ()
 {
     //$posts = Post::all();//returns all posts as a collection
 
-    \Illuminate\Support\Facades\DB::listen(function($query){
-        logger($query->sql, $query->bindings);
-    });
+    // \Illuminate\Support\Facades\DB::listen(function($query){
+    //     logger($query->sql, $query->bindings);
+    // });
 
     //load posts view and pass the posts collection
     return view('posts', [
-        'posts' => Post::with('category')->get()//returns all posts as a collection
+        'posts' => Post::latest()->with('category', 'author')->get()//returns all posts as a collection
     ]);
 });
 
@@ -46,6 +47,14 @@ Route::get('categories/{category:slug}', function(Category $category){
 
     return view('posts', [
         'posts' => $category->posts
+    ]);
+
+});
+
+Route::get('authors/{author:username}', function(User $author){
+
+    return view('posts', [
+        'posts' => $author->posts
     ]);
 
 });

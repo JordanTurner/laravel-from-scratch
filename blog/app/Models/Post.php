@@ -11,6 +11,8 @@ class Post extends Model
 
     protected $fillable = ['title', 'excerpt', 'body', 'slug', 'category_id'];
 
+    protected $with = ['category', 'author'];
+
     //eloquent relationship. A post "belongsTo" a single category in this blog
     public function category()
     {

@@ -27,7 +27,7 @@ Route::get('/', function ()
 
     //load posts view and pass the posts collection
     return view('posts', [
-        'posts' => Post::latest()->with('category', 'author')->get()//returns all posts as a collection
+        'posts' => Post::latest()->get()//returns all posts as a collection
     ]);
 });
 

@@ -1,31 +1,51 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\File;
+use Spatie\YamlFrontMatter\YamlFrontMatter;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Post extends Model
+class Post
 {
-    use HasFactory;
-
-    protected $fillable = ['title', 'excerpt', 'body', 'slug', 'category_id'];
-
-    protected $with = ['category', 'author'];
-
-    //eloquent relationship. A post "belongsTo" a single category in this blog
-    public function category()
+    public function __construct(public $title, public $excerpt, public $date, public $body, public $slug)
     {
-        /* a post in the database has a category_id column. With this eloquent relationship method we can point to the Category model
-            and access the other propeties via the id. So we could do something like $post->category->name to access the name of the category. 
-            Note that it should not be called as a method e.g $post->category() as this will return a belongsTo instance. Instead it should be accessed as a property
-            of the post $post->category and Laravel uses magic accessers to load the corresponding category*/
-        return $this->belongsTo(Category::class);
+        $this->title = $title;
+
+        $this->excerpt = $excerpt;
+
+        $this->date = $date;
+
+        $this->body = $body;
+
+        $this->slug = $slug;
     }
 
 
-    public function author()
+    public static function all()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return cache()->rememberForever('posts.all', function(){ // cache the results of this method forever. Give it a key of posts.all that can be refereneced later on to clear the cache
+
+            return collect(File::files(resource_path("posts"))) // create a collection of files
+            ->map(fn($file) => YamlFrontMatter::parseFile($file)) // map over the collection of files and parse each file as a YamlFrontMatter object
+            ->map(fn($document) => // map over the collection of YamlFrontMatter objects and create a new Post object from each. The end result is a collection of Post objects
+        
+                new Post(
+                    $document->title,
+                    $document->excerpt,
+                    $document->date,
+                    $document->body(),
+                    $document->slug
+                )
+            )
+            ->sortByDesc('date'); 
+        });
+    }
+
+    public static function find($slug)
+    {
+        // all() method returns a collection of Post objects
+        // firstWhere() method returns the first Post object that matches the slug
+
+        return static::all()->firstWhere('slug', $slug);
     }
 }

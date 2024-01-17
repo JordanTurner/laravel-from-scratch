@@ -1,10 +1,8 @@
 <?php
 
-use App\Models\Post;
-use App\Models\Category;
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use Spatie\YamlFrontMatter\YamlFrontMatter;
+use App\Models\Post;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -12,49 +10,40 @@ use Spatie\YamlFrontMatter\YamlFrontMatter;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
 |
 */
 
 Route::get('/', function ()
 {
-    //$posts = Post::all();//returns all posts as a collection
+    // return a view called "posts" and pass the posts (collection of Post objects) to the view (posts.blade.php)
 
-    // \Illuminate\Support\Facades\DB::listen(function($query){
-    //     logger($query->sql, $query->bindings);
-    // });
-
-    //load posts view and pass the posts collection
     return view('posts', [
-        'posts' => Post::latest()->get()//returns all posts as a collection
-    ]);
+        'posts' => Post::all()
+    ]);    
+
 });
 
-/*Type hinting the Post model here is known as "Route Model Binding". To do this the wildcard name has to match the variable name e.g. {post} and $post
-and then Laravel knows that you are trying to load the corresponding post by it's default key (id) e.g find the post with the given id
-*/
-Route::get('posts/{post:slug}', function(Post $post)//when visiting posts/something, pass the something to the funciton
+// curly brackets are used to indicate a dynamic route (wildcard)
+// we can then pass the wildcard as a variable to the function
+Route::get('posts/{post}', function($slug)
 {
-    //load the post view (post.blade.php) and pass the matching post to the view
+    // find a post by its slug and pass it to a view called "post"
+
+    /* 
+        you can pass a second argument to the view. The find method on the Post class will return the data for the requested post, 
+        which allows us to create a variable called $post and make it available on the post view
+    */
+    
+    /*
+        we could possibly use something similar for courses in the VT system. Whenever a user is visits course/something we could 
+        use the something as a wildcard and then use the something to find the course in the database and then pass the course to the view
+    */
+
     return view('post', [
-        'post' => $post
-    ]);
+        'post' => Post::find($slug)
+        ]
+    );
 
-});
-
-Route::get('categories/{category:slug}', function(Category $category){
-
-    return view('posts', [
-        'posts' => $category->posts
-    ]);
-
-});
-
-Route::get('authors/{author:username}', function(User $author){
-
-    return view('posts', [
-        'posts' => $author->posts
-    ]);
-
-});
+})->where('post', '[A-z_\-]+');

@@ -42,8 +42,8 @@ Route::get('posts/{post}', function($slug)
     */
 
     return view('post', [
-        'post' => Post::find($slug)
+        'post' => Post::findOrFail($slug) //find post matching the slug or throw an exception (404)
         ]
     );
 
-})->where('post', '[A-z_\-]+');
+});

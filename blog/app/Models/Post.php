@@ -45,7 +45,22 @@ class Post
     {
         // all() method returns a collection of Post objects
         // firstWhere() method returns the first Post object that matches the slug
+        // if no matching post is found, null is returned
 
         return static::all()->firstWhere('slug', $slug);
+    }
+
+    public static function findOrFail($slug)
+    {
+        // defer to the find() method to find the post
+
+        $post = static::find($slug);
+
+        if(! $post) // if no post is found, throw an exception
+        {
+            throw new ModelNotFoundException();
+        }
+
+        return $post; // if a post is found, return it
     }
 }

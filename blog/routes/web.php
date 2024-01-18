@@ -26,17 +26,21 @@ Route::get('/', function ()
 });
 
 
-// using Eloquent to find a post by its id
-Route::get('posts/{post}', function($id)
+// using Route Model Binding. Type hint a Post object and Laravel will automatically fetch the post from the database
+Route::get('posts/{post:slug}', function(Post $post) // find the post where the slug matches the wildcard in the url
 {
-    // find a post by its id and pass it to a view called "post"
-
     return view('post', [
-        'post' => Post::findOrFail($id) //find post matching the id or throw an exception (404)
+        'post' => $post
         ]
     );
+    // find a post by its id and pass it to a view called "post"
 
-})->where('post', '[0-9]+'); // only match if the post is a number
+    // return view('post', [
+    //     'post' => Post::findOrFail($id) //find post matching the id or throw an exception (404)
+    //     ]
+    // );
+
+}); // only match if the post is a number
 
 // curly brackets are used to indicate a dynamic route (wildcard)
 // we can then pass the wildcard as a variable to the function

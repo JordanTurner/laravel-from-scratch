@@ -12,7 +12,7 @@
 
             <h1>
                 <!-- double curly braces are used to echo out the value of a variable in laravel -->
-                <a href="posts/{{ $post->id }}">{{ $post->title }}</a>
+                <a href="posts/{{ $post->slug }}">{{ $post->title }}</a>
             </h1>
 
             <p>{{ $post->excerpt }}</p>

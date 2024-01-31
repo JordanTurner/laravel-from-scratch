@@ -15,8 +15,24 @@ class Post extends Model
         'title',
         'slug',
         'excerpt',
-        'body'
+        'body',
+        'category_id'
     ];
+
+    public function category()
+    {
+
+        // hasOne, hasMany, belongsTo, belongsToMany
+        // a post belongs to a category
+
+        return $this->belongsTo(Category::class);
+
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     // the getRouteKeyName method is used to specify which attribute should be used to retrieve a modelinstance
     // in this case we are using the slug attribute, but the id attribute is used by default

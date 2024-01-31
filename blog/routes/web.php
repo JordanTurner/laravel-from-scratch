@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Post;
+use App\Models\Category;
 
 
 /*
@@ -17,10 +18,16 @@ use App\Models\Post;
 
 Route::get('/', function ()
 {
-    // return a view called "posts" and pass the posts (collection of Post objects) to the view (posts.blade.php)
+    // to see the sql queries that are being run, use the following code
+    // this will highlight the n+1 problem
+    \Illuminate\Support\Facades\DB::listen(function($query)
+    {
+        logger($query->sql, $query->bindings);
+    });
 
+    // return a view called "posts" and pass the posts (collection of Post objects) to the view (posts.blade.php)
     return view('posts', [
-        'posts' => Post::all()
+        'posts' => Post::with('category')->get() // eager load the category relationship        
     ]);    
 
 });
@@ -40,7 +47,16 @@ Route::get('posts/{post:slug}', function(Post $post) // find the post where the 
     //     ]
     // );
 
-}); // only match if the post is a number
+});
+
+Route::get('categories/{category:slug}', function (Category $category)
+{
+    return view('posts', [
+        'posts' => $category->posts
+        ]
+    );
+
+});
 
 // curly brackets are used to indicate a dynamic route (wildcard)
 // we can then pass the wildcard as a variable to the function

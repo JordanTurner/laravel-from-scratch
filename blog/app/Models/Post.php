@@ -19,6 +19,8 @@ class Post extends Model
         'category_id'
     ];
 
+    protected $with = ['category', 'author']; // eager load the category and author relationships every time a post is retrieved from the database
+
     public function category()
     {
 
@@ -29,9 +31,9 @@ class Post extends Model
 
     }
 
-    public function user()
+    public function author()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // the getRouteKeyName method is used to specify which attribute should be used to retrieve a modelinstance

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Models\Post;
 use App\Models\Category;
+use App\Models\User;
 
 
 /*
@@ -20,14 +21,14 @@ Route::get('/', function ()
 {
     // to see the sql queries that are being run, use the following code
     // this will highlight the n+1 problem
-    \Illuminate\Support\Facades\DB::listen(function($query)
-    {
-        logger($query->sql, $query->bindings);
-    });
+    // \Illuminate\Support\Facades\DB::listen(function($query)
+    // {
+    //     logger($query->sql, $query->bindings);
+    // });
 
     // return a view called "posts" and pass the posts (collection of Post objects) to the view (posts.blade.php)
     return view('posts', [
-        'posts' => Post::with('category')->get() // eager load the category relationship        
+        'posts' => Post::latest()->get() // eager load the category relationship        
     ]);    
 
 });
@@ -51,8 +52,23 @@ Route::get('posts/{post:slug}', function(Post $post) // find the post where the 
 
 Route::get('categories/{category:slug}', function (Category $category)
 {
+    \Illuminate\Support\Facades\DB::listen(function($query)
+    {
+    logger($query->sql, $query->bindings);
+    });
+
     return view('posts', [
         'posts' => $category->posts
+        ]
+    );
+
+});
+
+Route::get('authors/{author:username}', function (User $author)
+{
+    //ddd($author);
+    return view('posts', [
+        'posts' => $author->posts
         ]
     );
 
